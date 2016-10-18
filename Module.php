@@ -1,5 +1,5 @@
 <?php
-namespace Test;
+namespace STest;
 
 use Omeka\Module\AbstractModule;
 use Omeka\Event\Event;
@@ -16,19 +16,43 @@ class Module extends AbstractModule
     
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
-/*
+
         $sharedEventManager->attach(
             'Omeka\Form\SettingForm',
-            Event::SITE_SETTINGS_ADD_ELEMENTS,
+            Event::ADD_ELEMENTS,
+            [$this, 'testViewEvents']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Form\SettingForm',
+            Event::ADD_INPUT_FILTERS,
+            [$this, 'testViewEvents']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Form\SettingForm',
+            Event::ADD_ELEMENTS,
             [$this, 'addElements']
         );
 
         $sharedEventManager->attach(
             'Omeka\Form\SettingForm',
-            Event::SITE_SETTINGS_ADD_INPUT_FILTERS,
-            [$this, 'addInputFilters']
+            Event::ADD_ELEMENTS,
+            [$this, 'addElements']
         );
-*/
+        
+        $sharedEventManager->attach(
+            'Omeka\Form\SiteSettingsForm',
+            Event::ADD_ELEMENTS,
+            [$this, 'addElements']
+        );
+
+        $sharedEventManager->attach(
+            '*',
+            'view.details',
+            [$this, 'testViewEvents']
+        );
+        
         $sharedEventManager->attach(
             '*',
             'view.show.before',
@@ -52,6 +76,26 @@ class Module extends AbstractModule
             'view.browse.after',
             [$this, 'testViewEvents']
         );
+        
+        $sharedEventManager->attach(
+            '*',
+            'view.manage-resources.before',
+            [$this, 'testViewEvents']
+        );
+        
+        $sharedEventManager->attach(
+            '*',
+            'view.manage-sites.before',
+            [$this, 'testViewEvents']
+        );
+        
+        
+        $sharedEventManager->attach(
+            '*',
+            'view.manage-sites.after',
+            [$this, 'testViewEvents']
+        );
+        
     }
     
     public function testViewEvents(Event $event)
@@ -62,11 +106,27 @@ class Module extends AbstractModule
     
     public function addElements(Event $event)
     {
+        $form = $event->getParam('form');
+        $fieldset = new Fieldset('example');
+        $fieldset->setLabel('Example Fieldset');
         
+        $fieldset->add([
+                'name' => 'example',
+                'type' => 'text',
+                'options' => [
+                    'label' => 'Example text input', // @translate
+                ],
+            ]);
+        
+        $form->add($fieldset);
     }
     
     public function addInputFilters(Event $event)
     {
-        
+        $inputFilter = $event->getParam('inputFilter');
+        $inputFilter->get('example')->add([
+                    'name' => 'example',
+                    'required' => false,
+                ]);
     }
 }

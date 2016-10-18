@@ -2,7 +2,7 @@
 return [
     'view_manager' => array(
         'template_path_stack' => array(
-            OMEKA_PATH.'/modules/Sharing/view',
+            OMEKA_PATH.'/modules/STest/view',
         ),
     ),
 ];
